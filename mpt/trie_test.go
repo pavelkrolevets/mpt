@@ -31,7 +31,7 @@ func TestPut(t *testing.T) {
 	putString(trie, "dog", "puppy")
 	putString(trie, "dogglesworth", "cat")
 
-	exp := common.HexToHash("8aad789dff2f538bca5d8ea56e8abe10f4c7ba3a5dea95fea4cd6e7c3a1168d3")
+	exp := common.HexToHash("919b9ccfeefcaf9660884cf991fe6daddd66ad32e49ddee5a2a65ea4cb3fbceb")
 	root := trie.Hash()
 	if root != exp {
 		t.Errorf("case 1: exp %x got %x", exp, root)
@@ -40,7 +40,7 @@ func TestPut(t *testing.T) {
 	trie = newEmpty()
 	putString(trie, "A", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 
-	exp = common.HexToHash("d23786fb4a010da3ce639d66d5e904a11dbc02746d1ce25029e53290cabf28ab")
+	exp = common.HexToHash("c5dd2643cdc69c74763d3f938da62aa8ac4be23420f0e0c8c0f0593368266153")
 	root, err := trie.Commit(nil)
 	if err != nil {
 		t.Fatalf("commit error: %v", err)
@@ -71,7 +71,7 @@ func TestDel(t *testing.T) {
 	}
 
 	hash := trie.Hash()
-	exp := common.HexToHash("5991bb8c6514148a29db676a14ac506cd2cd5775ace63c30a4fe457715e9ac84")
+	exp := common.HexToHash("3fd4e9bfe98bd6f58430e469c7a821d9bb5f89fd8aa65267735217325fa2026e")
 	if hash != exp {
 		t.Errorf("expected %x got %x", exp, hash)
 	}

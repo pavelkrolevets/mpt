@@ -1,4 +1,3 @@
-
 package mpt
 
 import (
@@ -6,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/pavelkrolevets/mpt/gost3411"
 	"github.com/pavelkrolevets/mpt/rlp"
-	"golang.org/x/crypto/sha3"
 )
 
 
@@ -97,7 +96,7 @@ func hashShortNodeChildren(n *ShortNode) (collapsed, cached *ShortNode) {
 }
 
 func hashData(data []byte) HashNode {
-	hash := sha3.NewLegacyKeccak256()
+	hash := gost3411.New256()
 	hash.Reset()
 	hash.Write(data)
 	return hash.Sum(nil)
