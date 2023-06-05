@@ -2,7 +2,6 @@ package mpt
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"sync"
 
@@ -107,14 +106,19 @@ func (t *MerklePatriciaTrie) Put(key, value []byte) {
 func (t *MerklePatriciaTrie) TryInsert(key, value []byte) error {
 	t.unhashed++
 	k := keybytesToHex(key)
-	if len(value) == 0 {
-		errors.New("Value should not empty")
+	if len(value) != 0 {
+		_, n, err := t.insert(t.root, nil, k, ValueNode(value))
+		if err != nil {
+			return err
+		}
+		t.root = n
+	} else {
+		_, n, err := t.delete(t.root, nil, k)
+		if err != nil {
+			return err
+		}
+		t.root = n
 	}
-	_, n, err := t.insert(t.root, nil, k, ValueNode(value))
-	if err != nil {
-		return err
-	}
-	t.root = n
 	return nil
 }
 

@@ -2,6 +2,7 @@ package mpt
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -98,6 +99,57 @@ func TestGet(t *testing.T) {
 		}
 		trie.Commit(nil)
 	}
+}
+
+func TestProof(t *testing.T) {
+	trie := newEmpty()
+
+	putString(trie, "doe", "reindeer")
+	putString(trie, "dog", "puppy")
+	putString(trie, "dogglesworth", "cat")
+	putString(trie, "dom", "111")
+	putString(trie, "dad", "222")
+
+	root := trie.Hash()
+	t.Logf("%x", root)
+
+	key := keybytesToHex([]byte("doe"))
+	var nodes []Node
+	tn := trie.root
+	for len(key) > 0 && tn != nil {
+		switch n := tn.(type) {
+		case *ShortNode:
+			if len(key) < len(n.Key) || !bytes.Equal(n.Key, key[:len(n.Key)]) {
+				// The trie doesn't contain the key.
+				tn = nil
+			} else {
+				tn = n.Val
+				key = key[len(n.Key):]
+			}
+			nodes = append(nodes, n)
+			t.Logf("Short Node key %v, val %v", n.Key, n.Val)
+		case *BranchNode:
+			tn = n.Children[key[0]]
+			key = key[1:]
+			nodes = append(nodes, n)
+			t.Logf("Branch Node children %v", n.Children)
+		case HashNode:
+			var err error
+			tn, err = trie.resolveHash(n, nil)
+			if err != nil {
+				t.Errorf(fmt.Sprintf("Unhandled trie error: %v", err))
+			}
+		default:
+			panic(fmt.Sprintf("%T: invalid node: %v", tn, tn))
+		}
+	}
+
+	proof, err := trie.Proof([]byte("doe"))
+	if err !=nil {
+		t.Errorf("got %x", err)
+	}
+	t.Logf("%v", proof)
+
 }
 
 func putString(trie *MerklePatriciaTrie, k, v string) {
